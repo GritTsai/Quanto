@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+</head>
+<body>
+ <script type="text/javascript" charset="utf-8">
+ 	var demoArr = ['sh600000', 'sh600031', 'sh600036','sz002024']; 
+ 	urls = "http://hq.sinajs.cn/list="
+ 	for (var i in demoArr){
+ 		urls=urls+demoArr[i] +","
+ 	}
+ 	
+ 	//document.writeln(urls)
+ 	document.write('<scr'+'ipt src="'+urls+ '"></scr'+'ipt>');
+ </script>
+
+ <script type="text/javascript">
+  for (i in demoArr) {   
+  	eval('var elements = hq_str_' + demoArr[i]+'.split(",")');
+  	document.write('&nbsp;'+elements[0]+'&nbsp;'+elements[1]+'&nbsp;'+elements[2]);
+  	document.writeln("<br>")
+ }
+</script> 
+</body>
+</html>
