@@ -69,17 +69,20 @@ class TulingWXBot(WXBot):
                     self.send_msg_by_uid(u'[Robot]' + u'机器人已开启！', msg['to_user_id'])
 
     def handle_msg_all(self, msg):
-
+        print msg
         if not self.robot_switch and msg['msg_type_id'] != 1:
             return
         if msg['msg_type_id'] == 1 and msg['content']['type'] == 0:  # reply to self
             self.auto_switch(msg)
         elif msg['msg_type_id'] == 4 and msg['content']['type'] == 0:  # text message from contact
+
             self.counter += 1
             reply_msg = self.tuling_auto_reply(msg['user']['id'], msg['content']['data'])
             self.send_msg_by_uid(reply_msg, msg['user']['id'])
-            self.s.synthesis(4,reply_msg,'voice/'+str(self.counter)+'-0.mp3')
-            self.s.synthesis(3,msg['content']['data'],'voice/'+str(self.counter)+'-1.mp3')
+
+            self.s.synthesis(3,msg['content']['data'],'voice/'+str(self.counter)+'-0.mp3')
+            self.s.synthesis(4, reply_msg, 'voice/' + str(self.counter) + '-1.mp3')
+            #self.send_voice_msg_by_uid('voice/' + str(self.counter) + '-1.mp3',msg['user']['id'])
         elif msg['msg_type_id'] == 3 and msg['content']['type'] == 0:  # group text message
             if 'detail' in msg['content']:
                 my_names = self.get_group_member_name(msg['user']['id'], self.my_account['UserName'])
