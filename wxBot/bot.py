@@ -92,7 +92,7 @@ class TulingWXBot(WXBot):
             reply_msg = self.tuling_auto_reply(msg['user']['id'], msg['content']['data'])
             if self.voice_enable:
                 self.c += 1
-                self.s.synthesis(self.c1%5,reply_msg,'voice/voice-'+str(self.c)+'.mp3')
+                self.s.synthesis(self.c%5,reply_msg,'voice/voice-'+str(self.c)+'.mp3')
                 self.send_file_msg_by_uid('voice/voice-'+str(self.c)+'.mp3',msg['user']['id'])
             else:
                 self.send_msg_by_uid(reply_msg, msg['user']['id'])
