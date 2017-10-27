@@ -13,6 +13,7 @@ class TulingWXBot(WXBot):
 
         self.tuling_key = ""
         self.robot_switch = True
+        self.voice_enable = False
 
         try:
             cf = ConfigParser.ConfigParser()
@@ -21,8 +22,10 @@ class TulingWXBot(WXBot):
             api_key = cf.get('baidu_speech', 'api_key')
             secret_key = cf.get('baidu_speech', 'secret_key')
             self.tuling_key = cf.get('main', 'key')
-            self.counter = 0
             self.s = baidu_speech(app_id,api_key,secret_key)
+            self.c = 0
+            if not os.path.exists('voice'):
+                os.makedirs('voice')
         except Exception:
             pass
         print 'tuling_key:', self.tuling_key
@@ -57,6 +60,8 @@ class TulingWXBot(WXBot):
         msg_data = msg['content']['data']
         stop_cmd = [u'退下', u'走开', u'关闭', u'关掉', u'休息', u'滚开']
         start_cmd = [u'出来', u'启动', u'工作']
+        voice_cmd_start = [u'恢复语音',u'开启语音']
+        voice_cmd_stop = [u'停止语音',u'关闭语音']
         if self.robot_switch:
             for i in stop_cmd:
                 if i == msg_data:
@@ -67,22 +72,50 @@ class TulingWXBot(WXBot):
                 if i == msg_data:
                     self.robot_switch = True
                     self.send_msg_by_uid(u'[Robot]' + u'机器人已开启！', msg['to_user_id'])
-
+        if self.voice_enable:
+            for i in voice_cmd_stop:
+                if i == msg_data:
+                    self.voice_enable = False
+                    self.send_msg_by_uid(u'[Robot]' + u'自动语音回复已关闭！', msg['to_user_id'])
+        else:
+            for i in voice_cmd_start:
+                if i == msg_data:
+                    self.voice_enable = True
+                    self.send_msg_by_uid(u'[Robot]' + u'自动语音回复已开启！', msg['to_user_id'])
     def handle_msg_all(self, msg):
-        print msg
         if not self.robot_switch and msg['msg_type_id'] != 1:
             return
         if msg['msg_type_id'] == 1 and msg['content']['type'] == 0:  # reply to self
             self.auto_switch(msg)
         elif msg['msg_type_id'] == 4 and msg['content']['type'] == 0:  # text message from contact
 
-            self.counter += 1
             reply_msg = self.tuling_auto_reply(msg['user']['id'], msg['content']['data'])
-            self.send_msg_by_uid(reply_msg, msg['user']['id'])
+            if self.voice_enable:
+                self.c += 1
+                self.s.synthesis(self.c1%5,reply_msg,'voice/voice-'+str(self.c)+'.mp3')
+                self.send_file_msg_by_uid('voice/voice-'+str(self.c)+'.mp3',msg['user']['id'])
+            else:
+                self.send_msg_by_uid(reply_msg, msg['user']['id'])
+        elif msg['msg_type_id'] == 4 and msg['content']['type'] == 4:  # voice message from contact
 
-            self.s.synthesis(3,msg['content']['data'],'voice/'+str(self.counter)+'-0.mp3')
-            self.s.synthesis(4, reply_msg, 'voice/' + str(self.counter) + '-1.mp3')
-            #self.send_voice_msg_by_uid('voice/' + str(self.counter) + '-1.mp3',msg['user']['id'])
+            file_prefix = 'voice/voice-'+msg['user']['id']
+            self.s.save_voice_file(msg['content']['voice'], file_prefix +'.mp3')
+            self.s.convert_mp3_2_wav(file_prefix+".mp3",file_prefix+".wav")
+            req = self.s.asr(file_prefix+".wav")
+            if req is None:
+                reply_msg = u'声音大一点'
+            else:
+                usrid = msg['user']['id']
+                reply_msg = self.tuling_auto_reply(usrid, req)
+                self.send_msg_by_uid(req, msg['user']['id'])
+
+
+            if self.voice_enable:
+                self.c += 1
+                self.s.synthesis(self.c%5, reply_msg, 'voice/voice-' + str(self.c) + '.mp3')
+                self.send_file_msg_by_uid('voice/voice-'+str(self.c)+'.mp3',msg['user']['id'])
+            else:
+                self.send_msg_by_uid(reply_msg, msg['user']['id'])
         elif msg['msg_type_id'] == 3 and msg['content']['type'] == 0:  # group text message
             if 'detail' in msg['content']:
                 my_names = self.get_group_member_name(msg['user']['id'], self.my_account['UserName'])
