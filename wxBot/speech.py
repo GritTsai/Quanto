@@ -6,7 +6,8 @@ from aip import AipSpeech
 import struct
 from pydub import AudioSegment ###需要安装pydub、ffmpeg
 import binascii
-
+import mp3play
+import time
 
 class baidu_speech():
     def __init__(self,app_id,api_key,secret_key):
@@ -17,7 +18,7 @@ class baidu_speech():
             with open(file, 'wb') as f:
                 f.write(result)
     def asr(self,voice):
-        result = self.aipSpeech.asr(self.get_file_content(voice), 'wav', 16000, {
+        result = self.aipSpeech.asr(self.get_file_content(voice), 'wav', 8000, {
             'lan': 'zh',
         })
 
@@ -41,7 +42,8 @@ class baidu_speech():
         sound.export(wav_file, format="wav")
     def convert_bin_2_ascii(self,mp3_files):
         return binascii.b2a_hex(self.get_file_content(mp3_files))
-
-
-
+    def play_mp3(self,mp3_file):
+        f = mp3play.load(mp3_file)
+        f.play()
+        time.sleep(min(150, f.seconds()+1))
 
