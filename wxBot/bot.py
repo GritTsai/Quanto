@@ -90,10 +90,12 @@ class TulingWXBot(WXBot):
         elif msg['msg_type_id'] == 4 and msg['content']['type'] == 0:  # text message from contact
 
             reply_msg = self.tuling_auto_reply(msg['user']['id'], msg['content']['data'])
+            self.c += 1
+            voice_file = 'voice/voice-' + str(self.c) + '.mp3'
+            self.s.synthesis(self.c % 5, reply_msg, voice_file)
+            self.s.play_mp3(voice_file)
             if self.voice_enable:
-                self.c += 1
-                self.s.synthesis(self.c%5,reply_msg,'voice/voice-'+str(self.c)+'.mp3')
-                self.send_file_msg_by_uid('voice/voice-'+str(self.c)+'.mp3',msg['user']['id'])
+                self.send_file_msg_by_uid(voice_file,msg['user']['id'])
             else:
                 self.send_msg_by_uid(reply_msg, msg['user']['id'])
         elif msg['msg_type_id'] == 4 and msg['content']['type'] == 4:  # voice message from contact
@@ -103,17 +105,17 @@ class TulingWXBot(WXBot):
             self.s.convert_mp3_2_wav(file_prefix+".mp3",file_prefix+".wav")
             req = self.s.asr(file_prefix+".wav")
             if req is None:
-                reply_msg = u'声音大一点'
+                reply_msg = u'声音大一点,我听不清楚'
             else:
                 usrid = msg['user']['id']
                 reply_msg = self.tuling_auto_reply(usrid, req)
                 self.send_msg_by_uid(req, msg['user']['id'])
-
-
+            self.c += 1
+            voice_file = 'voice/voice-' + str(self.c) + '.mp3'
+            self.s.synthesis(self.c%5, reply_msg, voice_file)
+            self.s.play_mp3(voice_file)
             if self.voice_enable:
-                self.c += 1
-                self.s.synthesis(self.c%5, reply_msg, 'voice/voice-' + str(self.c) + '.mp3')
-                self.send_file_msg_by_uid('voice/voice-'+str(self.c)+'.mp3',msg['user']['id'])
+                self.send_file_msg_by_uid(voice_file,msg['user']['id'])
             else:
                 self.send_msg_by_uid(reply_msg, msg['user']['id'])
         elif msg['msg_type_id'] == 3 and msg['content']['type'] == 0:  # group text message
