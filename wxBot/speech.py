@@ -2,48 +2,56 @@
 # coding: utf-8
 #
 
-from aip import AipSpeech
-import struct
-from pydub import AudioSegment ###需要安装pydub、ffmpeg
 import binascii
-import mp3play
 import time
+import mp3play
+from aip import AipSpeech
+from pydub import AudioSegment  # 需要安装pydub、ffmpeg
 
-class baidu_speech():
-    def __init__(self,app_id,api_key,secret_key):
+
+class BaiduSpeech:
+    def __init__(self, app_id, api_key, secret_key):
         self.aipSpeech = AipSpeech(app_id, api_key, secret_key)
-    def synthesis(self,per, word,file):
-        result = self.aipSpeech.synthesis(word, 'zh', 1, {'vol': 5, 'per':per,})
+
+    def synthesis(self, per, word, syn_file):
+        result = self.aipSpeech.synthesis(word, 'zh', 1, {'vol': 5, 'per': per, })
         if not isinstance(result, dict):
-            with open(file, 'wb') as f:
+            with open(syn_file, 'wb') as f:
                 f.write(result)
-    def asr(self,voice):
+
+    def asr(self, voice):
         result = self.aipSpeech.asr(self.get_file_content(voice), 'wav', 8000, {
             'lan': 'zh',
         })
 
-        if isinstance(result,dict) and result['err_no'] == 0:
+        if isinstance(result, dict) and result['err_no'] == 0:
             return result['result'][0]
         else:
             print result
             return None
 
-    def get_file_content(self,filePath):
-        with open(filePath, 'rb') as fp:
+    @staticmethod
+    def get_file_content(file_path):
+        with open(file_path, 'rb') as fp:
             return fp.read()
 
-    def save_voice_file(self, voice_ascii_data, output_file):
-        bdata = binascii.a2b_hex(voice_ascii_data)
+    @staticmethod
+    def save_voice_file(voice_ascii_data, output_file):
+        data = binascii.a2b_hex(voice_ascii_data)
         with open(output_file, 'wb') as f:
-            f.write(bdata)
+            f.write(data)
 
-    def convert_mp3_2_wav(self,mp3_file,wav_file):
+    @staticmethod
+    def convert_bin_2_ascii(mp3_files):
+        return binascii.b2a_hex(BaiduSpeech.get_file_content(mp3_files))
+
+    @staticmethod
+    def convert_mp3_2_wav(mp3_file, wav_file):
         sound = AudioSegment.from_mp3(mp3_file)
         sound.export(wav_file, format="wav")
-    def convert_bin_2_ascii(self,mp3_files):
-        return binascii.b2a_hex(self.get_file_content(mp3_files))
-    def play_mp3(self,mp3_file):
+
+    @staticmethod
+    def play_mp3(mp3_file):
         f = mp3play.load(mp3_file)
         f.play()
-        time.sleep(min(150, f.seconds()+1))
-
+        time.sleep(min(150, f.seconds() + 1))
