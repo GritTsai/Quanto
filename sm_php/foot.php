@@ -1,0 +1,3 @@
+<div id="ft">
+<a href="#" target="_blank">关于本站</a> - <a href="#" target="_blank">联系我们</a> - <a href="#" target="_blank">广告服务</a> - <a href="#" target="_blank">合作伙伴</a> - <a href="/admin/" target="_blank">管理登陆</a> - <a href="http://www.senlon.net/" target="_blank">网站导航</a><br>Copyright &copy; 2006-2010 <a href="/">Senlon</a> All Rights Reserved<br><script language="JavaScript" type="text/javascript">tj()</script>
+</div>

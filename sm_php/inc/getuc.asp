@@ -1,0 +1,21 @@
+<%
+'获取用户cookies信息
+dim xing,ming,xingbie,xuexing,nian1,yue1,ri1,hh1,mm1,nian2,yue2,ri2,hh2,mm2,sx
+xing=request.Cookies("laisuanming")("xing")
+ming=request.Cookies("laisuanming")("ming")
+xingbie=request.Cookies("laisuanming")("xingbie")
+xuexing=request.Cookies("laisuanming")("xuexing")
+'公历
+nian1=request.Cookies("laisuanming")("nian1")
+yue1=request.Cookies("laisuanming")("yue1")
+ri1=request.Cookies("laisuanming")("ri1")
+hh1=request.Cookies("laisuanming")("hh1")
+mm1=request.Cookies("laisuanming")("mm1")
+'农历
+nian2=request.Cookies("laisuanming")("nian2")
+yue2=request.Cookies("laisuanming")("yue2")
+ri2=request.Cookies("laisuanming")("ri2")
+hh2=request.Cookies("laisuanming")("hh2")
+mm2=request.Cookies("laisuanming")("mm2")
+sx=request.Cookies("laisuanming")("sx")
+%>
