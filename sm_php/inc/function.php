@@ -527,4 +527,318 @@ function GbToBig($content)
 	return implode($bigContent);
 }
 
+//得到一个汉字字意五行
+function getzywx($txt)
+{
+	//UTF-8 汉字
+	if(preg_match("/^[\x{4e00}-\x{9fa5}]+$/u", $txt))
+	{
+		//echo '汉字';
+	} else 
+	{
+		echo '非汉字';
+		return 0;
+	}
+	
+	// Performing SQL query
+	$query = 'select * from hzwh';
+	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+
+	while($row = pg_fetch_row($result))
+	{
+		if(mb_strstr($row[1], $txt, false, "utf-8")) //['hz']
+		{
+			return $row[0]; //['wh']
+		}
+	}
+	
+	echo $txt.' not found';
+	return 0; //not found
+}
+
+//根据笔画数得到五行（金木水火土）
+function getbhwx($sc)
+{
+	$sc=($sc % 10);
+	
+	switch($sc)
+	{
+	case 1:
+		$sctxt="木";
+		break;
+	case 2:
+		$sctxt="木";
+		break;
+	case 3:
+		$sctxt="火";
+		break;
+	case 4:
+		$sctxt="火";
+		break;
+	case 5:
+		$sctxt="土";
+		break;
+	case 6:
+		$sctxt="土";
+		break;
+	case 7:
+		$sctxt="金";
+		break;
+	case 8:
+		$sctxt="金";
+		break;
+	case 9:
+		$sctxt="水";
+		break;
+	case 10:
+		$sctxt="水";
+		break;
+	case 0:
+		$sctxt="水";
+		break;
+	}
+	return $sctxt;
+}
+
+//得到一个数字(如时辰小时)的地支
+function DiZhi($i)
+{
+	$i=($i % 24);
+	switch($i)
+	{
+	case 0:
+		$dz="子";
+		break;
+	case 1:
+		$dz="丑";
+		break;
+	case 2:
+		$dz="丑";
+		break;
+	case 3:
+		$dz="寅";
+		break;
+	case 4:
+		$dz="寅";
+		break;
+	case 5:
+		$dz="卯";
+		break;
+	case 6:
+		$dz="卯";
+		break;
+	case 7:
+		$dz="辰";
+		break;
+	case 8:
+		$dz="辰";
+		break;
+	case 9:
+		$dz="巳";
+		break;
+	case 10:
+		$dz="巳";
+		break;
+	case 11:
+		$dz="午";
+		break;
+	case 12:
+		$dz="午";
+		break;
+	case 13:
+		$dz="未";
+		break;
+	case 14:
+		$dz="未";
+		break;
+	case 15:
+		$dz="申";
+		break;
+	case 16:
+		$dz="申";
+		break;
+	case 17:
+		$dz="酉";
+		break;
+	case 18:
+		$dz="酉";
+		break;
+	case 19:
+		$dz="戌";
+		break;
+	case 20:
+		$dz="戌";
+		break;
+	case 21:
+		$dz="亥";
+		break;
+	case 22:
+		$dz="亥";
+		break;
+	case 23:
+		$dz="子";
+		break;
+	}
+	return $dz;
+}
+
+//作用暂时未知，似乎是从吉凶得到权重数
+function getpf($sc)
+{
+	if(0==strcmp($sc, "大吉"))
+	{
+		$szpf=12;
+	} else if (0==strcmp($sc, "吉"))
+	{
+		$szpf=8;
+	} else if (0==strcmp($sc, "半吉"))
+	{
+		$szpf=5;
+	} else if (0==strcmp($sc, "平"))
+	{
+		$szpf=4;
+	} else if (0==strcmp($sc, "半凶"))
+	{
+		$szpf=2;
+	} else if (0==strcmp($sc, "凶"))
+	{
+		$szpf=1;
+	} else if (0==strcmp($sc, "大凶"))
+	{
+		$szpf=0;
+	} else 
+	{
+		echo "unexpected word ".$sc;
+		$szpf=0;
+	}
+	return $szpf;
+}
+
+//从甲子得到纳音，如‘乙丑’对应‘海中金’
+function nayin($tgdz)
+{
+	// Performing SQL query
+	$query = 'select * from jiazi';
+	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+
+	while($row = pg_fetch_row($result))
+	{
+		if(mb_strstr($row[1], $tgdz, false, "utf-8")) //['jiazi']
+		{
+			return $row[2]; //['layin']
+		}
+	}
+	
+	echo $tgdz.' not found';
+	return 0; //not found
+}
+
+function tgdzwx($tgdz)
+{
+	switch($tgdz)
+	{
+	case "子":
+		$wx="水";
+		break;
+	case "亥":
+		$wx="水";
+		break;
+	case "寅":
+		$wx="木";
+		break;
+	case "卯":
+		$wx="木";
+		break;
+	case "巳":
+		$wx="火";
+		break;
+	case "午":
+		$wx="火";
+		break;
+	case "申":
+		$wx="金";
+		break;
+	case "酉":
+		$wx="金";
+		break;
+	case "辰":
+		$wx="土";
+		break;
+	case "戌":
+		$wx="土";
+		break;
+	case "丑":
+		$wx="土";
+		break;
+	case "未":
+		$wx="土";
+		break;
+    case "甲":
+		$wx="木";
+		break;
+    case "乙":
+		$wx="木";
+		break;
+    case "丙":
+		$wx="火";
+		break;
+    case "丁":
+		$wx="火";
+		break;
+    case "戊":
+		$wx="土";
+		break;
+    case "己":
+		$wx="土";
+		break;
+    case "庚":
+		$wx="金";
+		break;
+    case "辛":
+		$wx="金";
+		break;
+    case "壬":
+		$wx="水";
+		break;
+    case "癸":
+		$wx="水";
+		break;
+	default:
+		echo "unexpected word: ".$tgdz;
+		$wx="水";
+	}
+	
+	return $wx;
+}
+
+//由月份得到四季
+function siji($yue)
+{
+	switch($yue)
+	{
+	case 12:
+	case 1:
+	case 2:
+		$sj="冬";
+		return $sj;
+	case 3:
+	case 4:
+	case 5:
+		$sj="春";
+		return $sj;
+	case 6:
+	case 7:
+	case 8:
+		$sj="夏";
+		return $sj;
+	case 9:
+	case 10:
+	case 11:
+		$sj="秋";
+		return $sj;
+	}
+
+	return 0;
+}
+
 ?>

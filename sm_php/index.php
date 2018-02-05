@@ -359,9 +359,10 @@ $lunar=new Lunar();
 $month=$lunar->convertSolarToLunar(2018,2,4);//将阳历转换为阴历 
 echo '<pre>'; 
 print_r($month);
+//$res=GbToBig('皑伤泄');//转繁体字
+$res=nayin("甲午");
+echo $res;
 include "foot.php";
-//$res=GbToBig('皑伤泄');
-//echo $res;
 ?>
 </body>
 </html>
